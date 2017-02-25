@@ -22,20 +22,29 @@ def create_campaign_object(json):
 	expiring_date = json['expiringDate']
 	num_codes = json['numCodes']
 	code_list = []
+	# campaign = Campaign(campaign_name, max_num_uses, expiring_date, campaign_desc, num_codes)
 	if 'codeList' in json:
 		code_list = json['codeList']
-	else:
-		code_list = [] #generate_codes(num_codes)
-	# return Campaign(campaign_name, campaign_desc, max_num_uses, expiring_date,num_codes, code_list)
+		#campaign.add_new_coupons(code_list)
+	# else:
+	# 	campaign.generate_new_coupons(num_codes)
+	# return jsonify(couponList=campaign.get_coupons())
 	return jsonify(campaign_name=campaign_name, campaign_desc=campaign_desc)
+
+@app.route("/campaign", methods=['GET'])
+def campaign_get():
+	# list_of_campaigns = campaign_manager.get_all_campaigns()
+	# return jsonify(campaigns=[e.serialize() for e in list_of_campaigns])
+	return jsonify(campaigns="future list of campaigns")
+
+
+@app.route('/campaign/<campaign_id>')
+def campaign_get_from_id(campaign_id):
+    # show the user profile for that user
+    # campaign = campaign_manage.get_campaign(campaign_id)
+    # return jsonify(campaign = campaign.serialize())
+    return jsonify(campaignId=campaign_id)
 
 if __name__ == "__main__":
 	app.run(debug=True)
 
-
-#Campaign Name
-# Campaign Description
-# Max # uses per code
-# Expiring date
-# Number of Codes
-# List of Codes

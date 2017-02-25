@@ -1,6 +1,8 @@
 import Coupon
 
 class Campaign():
+
+
 	def __init__(self, name, max_uses_per_code, expiry_date, desc, number_of_codes=0):
 		self.name = name
 		self.max_uses_per_code = max_uses_per_code
@@ -14,3 +16,17 @@ class Campaign():
 
 	def add_new_coupons(self, coupon_code_list):
 		# generates coupons for this campaign, using the codes in the list.
+
+	#Gets the list of coupons for this campaign
+	def get_coupons(self):
+		return self.coupons
+
+	def serialize(self):
+        return {
+            'name': self.name, 
+            'maxUsesPerCode': self.max_uses_per_code,
+            'expiryDate': self.expiryDate,
+            'desc': self.desc,
+            'number_of_codes': self.number_of_codes
+        }
+
