@@ -21,6 +21,8 @@ class Campaign():
 	def get_coupons(self):
 		return self.coupons
 
+	
+		
 	def serialize(self):
         return {
             'name': self.name, 
