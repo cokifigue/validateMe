@@ -1,0 +1,6 @@
+validateMe/coupon_server.py
+validateMe.egg-info/PKG-INFO
+validateMe.egg-info/SOURCES.txt
+validateMe.egg-info/dependency_links.txt
+validateMe.egg-info/requires.txt
+validateMe.egg-info/top_level.txt

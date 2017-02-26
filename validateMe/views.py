@@ -1,9 +1,9 @@
-from flask import Flask
 from flask import request
 from flask import jsonify
 import random
 
-app = Flask(__name__)
+from validateMe import app
+
 
 def create_campaign_from_json(json):
 	campaign = Campaign(json['name'], json['maxNumUses'], 
@@ -56,7 +56,3 @@ def redeem_code(code):
     # campaign = campaign_manage.get_campaign(campaign_id)
     # return jsonify(couponList=campaign.get_coupons())
     return jsonify(campaignId=campaign_id)
-
-if __name__ == "__main__":
-	app.run(debug=True)
-
