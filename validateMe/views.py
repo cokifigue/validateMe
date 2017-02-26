@@ -2,8 +2,8 @@ from flask import request
 from flask import jsonify
 import random
 
+from models.campaign import Campaign
 from validateMe import app
-
 
 def create_campaign_from_json(json):
 	campaign = Campaign(json['name'], json['maxNumUses'], 
@@ -23,9 +23,8 @@ def hello():
 @app.route("/campaign", methods=['POST'])
 def post_campaign():
 	json = request.get_json()
-	# campaign = create_campaign_from_json(json)
-	# return jsonify(couponList=campaign.get_coupons())
-	return jsonify(campaign_name=campaign_name, campaign_desc=campaign_desc)
+	campaign = create_campaign_from_json(json)
+	return jsonify(couponList=campaign.get_coupons())
 
 @app.route("/campaign", methods=['GET'])
 def get_all_campaigns():
