@@ -20,6 +20,17 @@ def create_campaign_from_json(json):
 def hello():
 	return "Hello World!"
 
+
+#@app.route("/save_test")
+#def save():
+#	campaign = Campaign()
+#	return "Hello World!"
+#
+#@app.route("/load_test")
+#def load():
+#	return "Hello World!"
+#
+
 @app.route("/campaign", methods=['POST'])
 def post_campaign():
 	json = request.get_json()

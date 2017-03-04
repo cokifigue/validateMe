@@ -1,8 +1,18 @@
 import Coupon
 from hashids import Hashids
 from random import randint
+from validateMe import db
+from datetime import datetime
 
-class Campaign():
+class Campaign(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(80))
+	max_uses_per_code = db.Column(db.Integer)
+	expiry_date = db.Column(db.String(100))
+	desc = db.Column(db.String(100))
+	number_of_codes = db.Column(db.Integer)
+	#coupons = db.relationship('Coupon', backref='campaign',
+	#	lazy='dynamic')
 
 	def __init__(self, name, max_uses_per_code, expiry_date, desc, number_of_codes=0):
 		self.name = name
@@ -10,7 +20,7 @@ class Campaign():
 		self.expiry_date = expiry_date
 		self.desc = desc
 		self.number_of_codes = number_of_codes
-		self.coupons = [];
+		#self.coupons = [];
 
 	def generate_new_coupons(self, num_to_generate=1):
 		code_list = []
@@ -29,6 +39,12 @@ class Campaign():
 	def get_coupons(self):
 		return self.coupons
 	
+
+	def add_new_coupons(self, coupon_code_list):
+	# generates coupons for this campaign, using the codes in the list.
+		return None
+
+
 	def serialize(self):
 		return {'name': self.name, 
 				'maxUsesPerCode': self.max_uses_per_code,

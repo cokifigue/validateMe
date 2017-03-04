@@ -1,8 +1,11 @@
 class Coupon():
+	 #person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
+
 	def __init__(self, code, campaign_id, uses_remaining):
 		self.code = code
 		self.campaign_id = campaign_id
 		self.uses_remaining = uses_remaining
+
 
 	def isValid(self):
 		# verify that this coupon has remaining uses
