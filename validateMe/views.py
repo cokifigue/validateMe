@@ -3,8 +3,15 @@ from flask import jsonify
 import random
 
 from models.campaign import Campaign
+from models.coupon import Coupon
 from validateMe import app
 
+
+@app.before_first_request
+def setup():
+    # Recreate database each time for demo
+    db.create_all()
+    
 def create_campaign_from_json(json):
 	campaign = Campaign(json['name'], json['maxNumUses'], 
 						json['expiringDate'], json['desc'], 

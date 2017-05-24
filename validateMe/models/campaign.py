@@ -1,4 +1,4 @@
-import Coupon
+from coupon import Coupon
 from hashids import Hashids
 from random import randint
 from validateMe import db
@@ -14,13 +14,13 @@ class Campaign(db.Model):
 	#coupons = db.relationship('Coupon', backref='campaign',
 	#	lazy='dynamic')
 
-	def __init__(self, name, max_uses_per_code, expiry_date, desc, number_of_codes=0):
-		self.name = name
-		self.max_uses_per_code = max_uses_per_code
-		self.expiry_date = expiry_date
-		self.desc = desc
-		self.number_of_codes = number_of_codes
-		#self.coupons = [];
+	# def __init__(self, name, max_uses_per_code, expiry_date, desc, number_of_codes=0):
+	# 	self.name = name
+	# 	self.max_uses_per_code = max_uses_per_code
+	# 	self.expiry_date = expiry_date
+	# 	self.desc = desc
+	# 	self.number_of_codes = number_of_codes
+	# 	#self.coupons = [];
 
 	def generate_new_coupons(self, num_to_generate=1):
 		code_list = []
