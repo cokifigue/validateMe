@@ -11,33 +11,33 @@ class Campaign(db.Model):
 	expiry_date = db.Column(db.String(100))
 	desc = db.Column(db.String(100))
 	number_of_codes = db.Column(db.Integer)
+	coupons = []
 	#coupons = db.relationship('Coupon', backref='campaign',
 	#	lazy='dynamic')
 
-	# def __init__(self, name, max_uses_per_code, expiry_date, desc, number_of_codes=0):
-	# 	self.name = name
-	# 	self.max_uses_per_code = max_uses_per_code
-	# 	self.expiry_date = expiry_date
-	# 	self.desc = desc
-	# 	self.number_of_codes = number_of_codes
-	# 	#self.coupons = [];
+	def __init__(self, name, max_uses_per_code, expiry_date, desc, number_of_codes=0):
+		self.name = name
+		self.max_uses_per_code = max_uses_per_code
+		self.expiry_date = expiry_date
+		self.desc = desc
+		self.number_of_codes = number_of_codes
+		#self.coupons = [];
 
-	def generate_new_coupons(self, num_to_generate=1):
-		code_list = []
-		for i in range(num_to_generate):
-			code_list.append(generate_code())
-		return code_list
 	
 	def generate_code(self):
 		rand1 = randint(0,999)
 		rand2 = randint(0,999)
 		rand3 = randint(0,999)
 		#id=campaign_id
-		hashids = Hashids(rand1,rand2,rand3)#id)
+		hashids = Hashids()
+		hashid = hashids.encode(rand1, rand2, rand3)
+		return hashid
 
-	#Gets the list of coupons for this campaign
-	def get_coupons(self):
-		return self.coupons
+	def generate_new_coupons(self, num_to_generate=1):
+		code_list = []
+		for i in range(num_to_generate):
+			code_list.append(self.generate_code())
+		self.coupons = code_list
 	
 
 	def add_new_coupons(self, coupon_code_list):
@@ -46,9 +46,11 @@ class Campaign(db.Model):
 
 
 	def serialize(self):
-		return {'name': self.name, 
+		return {'id' : self.id,
+				'name': self.name, 
 				'maxUsesPerCode': self.max_uses_per_code,
-				'expiryDate': self.expiryDate,
+				'expiryDate': self.expiry_date,
 				'desc': self.desc,
-				'number_of_codes': self.number_of_codes}
+				'number_of_codes': self.number_of_codes,
+				'coupons': self.coupons}
 

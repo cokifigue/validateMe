@@ -5,22 +5,24 @@ import random
 from models.campaign import Campaign
 from models.coupon import Coupon
 from validateMe import app
+from validateMe import db
+import json
 
 
 @app.before_first_request
 def setup():
     # Recreate database each time for demo
+    db.drop_all()
     db.create_all()
     
 def create_campaign_from_json(json):
-	campaign = Campaign(json['name'], json['maxNumUses'], 
-						json['expiringDate'], json['desc'], 
-						json['num_codes'])
+	campaign = Campaign(json['name'], json['maxNumUses'], json['expiringDate'], json['desc'], json['numCodes'])
+	print json
 	if 'codeList' in json:
 		code_list = json['codeList']
 		campaign.add_new_coupons(code_list)
 	else:
-	 	campaign.generate_new_coupons(num_codes)
+	 	campaign.generate_new_coupons(json['numCodes'])
 	return campaign
 
 @app.route("/")
@@ -40,21 +42,21 @@ def hello():
 
 @app.route("/campaign", methods=['POST'])
 def post_campaign():
-	json = request.get_json()
-	campaign = create_campaign_from_json(json)
-	return jsonify(couponList=campaign.get_coupons())
+	input_json = request.get_json()
+	campaign = create_campaign_from_json(input_json)
+	db.session.add(campaign)
+	db.session.commit()
+	return jsonify(campaigns=campaign.serialize())
 
 @app.route("/campaign", methods=['GET'])
 def get_all_campaigns():
-	# list_of_campaigns = campaign_manager.get_all_campaigns()
-	# return jsonify(campaigns=[e.serialize() for e in list_of_campaigns])
-	return jsonify(campaigns="future list of campaigns")
+	list_of_campaigns = Campaign.query.all()
+	return jsonify(campaigns=[e.serialize() for e in list_of_campaigns])
 
-@app.route('/campaign/<campaign_id>')
+@app.route('/campaign/<int:campaign_id>')
 def get_campaign_from_id(campaign_id):
-    # campaign = campaign_manage.get_campaign(campaign_id)
-    # return jsonify(campaign = campaign.serialize())
-    return jsonify(campaignId=campaign_id)
+    campaign = Campaign.query.filter_by(id=campaign_id).first()
+    return jsonify(campaign = campaign.serialize())
 
 @app.route('/campaign/<campaign_id>/codes')
 def get_codes_from_campaign_id(campaign_id):
