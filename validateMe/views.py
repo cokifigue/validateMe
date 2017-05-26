@@ -60,9 +60,8 @@ def get_campaign_from_id(campaign_id):
 
 @app.route('/campaign/<campaign_id>/codes')
 def get_codes_from_campaign_id(campaign_id):
-    # campaign = campaign_manage.get_campaign(campaign_id)
-    # return jsonify(couponList=campaign.get_coupons())
-    return jsonify(campaignId=campaign_id)
+    campaign = Campaign.query.filter_by(id=campaign_id).first()
+    return jsonify(coupons=[c.serialize() for c in campaign.coupons])
 
 @app.route('/validate/<code>')
 def validate_code(code):
