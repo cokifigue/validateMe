@@ -1,27 +1,35 @@
-class Coupon():
-	 #person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
+from validateMe import db
 
-	def __init__(self, code, campaign_id, uses_remaining):
-		self.code = code
-		self.campaign_id = campaign_id
-		self.uses_remaining = uses_remaining
+class Coupon(db.Model):
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'))
+    uses_remaining = db.Column(db.Integer)
+    code = db.Column(db.String(80), primary_key=True)
 
-
-	def isValid(self):
-		# verify that this coupon has remaining uses
-		if self.uses_remaining <= 0:
-			return False
-
-		# verify that this coupon's campaign has not expired
-		# TODO
-
-		return True
+    def __init__(self, code, uses_remaining):
+        self.code = code
+        self.uses_remaining = uses_remaining
 
 
-	def redeem(self):
-		# check if this coupon is valid
-		if self.isValid == False:
-			raise ValueError('This coupon is no longer valid')
+    def isValid(self):
+        # verify that this coupon has remaining uses
+        if self.uses_remaining <= 0:
+            return False
 
-		# redeem this coupon
-		self.uses_remaining -= 1
+        # verify that this coupon's campaign has not expired
+        # TODO
+
+        return True
+
+
+    def redeem(self):
+        # check if this coupon is valid
+        if self.isValid == False:
+            raise ValueError('This coupon is no longer valid')
+
+        # redeem this coupon
+        self.uses_remaining -= 1
+
+    def serialize(self):
+        return {'code' : self.code,
+                'uses_remaining': self.uses_remaining,
+                'campaign_id': self.campaign.id}

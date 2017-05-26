@@ -1,12 +1,12 @@
 from flask import request
 from flask import jsonify
 import random
+import json
 
 from models.campaign import Campaign
 from models.coupon import Coupon
 from validateMe import app
 from validateMe import db
-import json
 
 
 @app.before_first_request

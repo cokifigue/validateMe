@@ -1,4 +1,5 @@
-validateMe/coupon_server.py
+validateMe/__init__.py
+validateMe/views.py
 validateMe.egg-info/PKG-INFO
 validateMe.egg-info/SOURCES.txt
 validateMe.egg-info/dependency_links.txt
