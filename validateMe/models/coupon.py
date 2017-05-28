@@ -23,11 +23,15 @@ class Coupon(db.Model):
 
     def redeem(self):
         # check if this coupon is valid
-        if self.isValid == False:
+        if not self.isValid():
             raise ValueError('This coupon is no longer valid')
 
         # redeem this coupon
-        self.uses_remaining -= 1
+        try:
+            self.uses_remaining -= 1
+            db.session.commit()
+        except Exception as e:
+            raise e
 
     def serialize(self):
         return {'code' : self.code,
