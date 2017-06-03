@@ -1,4 +1,5 @@
 from validateMe import db
+from datetime import datetime
 
 class Coupon(db.Model):
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'))
@@ -10,20 +11,19 @@ class Coupon(db.Model):
         self.uses_remaining = uses_remaining
 
 
-    def isValid(self):
+    def isValid(self, campaign):
         # verify that this coupon has remaining uses
         if self.uses_remaining <= 0:
             return False
 
-        # verify that this coupon's campaign has not expired
-        # TODO
+        # Example of expected time format 2017-08-31T18:25:43.511Z
+        datetime_object = datetime.strptime(campaign.expiration_date, '%Y-%m-%dT%H:%M:%S.%fZ')
+        print datetime_object
+        return datetime.now() <= datetime_object
 
-        return True
-
-
-    def redeem(self):
+    def redeem(self, campaign):
         # check if this coupon is valid
-        if not self.isValid():
+        if not self.isValid(campaign):
             raise ValueError('This coupon is no longer valid')
 
         # redeem this coupon
