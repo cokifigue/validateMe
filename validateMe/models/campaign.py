@@ -47,7 +47,12 @@ class Campaign(db.Model):
 
 	def update_expiration_date(self, new_expiration_date):
 		self.expiration_date = new_expiration_date.strftime("%Y-%m-%dT%H:%M:%S.%f")
-    	db.session.commit()
+		db.session.commit()
+
+	def is_active(self):
+		# Example of expected time format 2017-08-31T18:25:43.511Z
+		datetime_object = datetime.strptime(self.expiration_date, '%Y-%m-%dT%H:%M:%S.%fZ')
+		return datetime.now() <= datetime_object
 
 	def serialize(self):
 		return {'id' : self.id,
