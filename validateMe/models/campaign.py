@@ -33,7 +33,7 @@ class Campaign(db.Model):
 
 	def generate_new_coupons(self, num_to_generate=1):
 		for i in range(num_to_generate):
-			create_coupon(self.generate_code(), self.max_uses_per_code)
+			self.create_coupon(self.generate_code(), self.max_uses_per_code)
 			
 	def add_new_coupons(self, coupon_code_list):
 		for code in coupon_code_list:
@@ -46,7 +46,7 @@ class Campaign(db.Model):
 		db.session.commit()
 
 	def update_expiration_date(self, new_expiration_date):
-		self.expiration_date = new_expiration_date.strftime("%Y-%m-%dT%H:%M:%S.%f")
+		self.expiration_date = new_expiration_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 		db.session.commit()
 
 	def is_active(self):

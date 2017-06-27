@@ -1,14 +1,21 @@
 from flask import request
 from flask import jsonify
 from datetime import datetime
+from flask_restplus import Resource
+from api_models import coupon, campaign
 import json
 import random
+
 
 from models.campaign import Campaign
 from models.coupon import Coupon
 from validateMe import app
 from validateMe import db
+from validateMe import api
 
+campaign_ns = api.namespace('campaign', description='Operations related to campaign')
+validate_ns = api.namespace('validate', description='Operations related to coupon validation')
+redeem_ns = api.namespace('redeem', description='Operations related to coupon redemption')
 
 @app.before_first_request
 def setup():
@@ -18,13 +25,13 @@ def setup():
 
     
 def create_campaign_from_json(json):
-    campaign = Campaign(json['name'], json['maxNumUses'], json['expirationDate'], json['desc'], json['numCodes'])
+    campaign = Campaign(json['name'], json['max_uses_per_code'], json['expiration_date'], json['desc'], json['number_of_codes'])
     print json
-    if 'codeList' in json:
-        code_list = json['codeList']
+    if 'coupons' in json and len(json['coupons']) > 0:
+        code_list = json['coupons']
         campaign.add_new_coupons(code_list)
     else:
-        campaign.generate_new_coupons(json['numCodes'])
+        campaign.generate_new_coupons(json['number_of_codes'])
     return campaign
 
 
@@ -37,72 +44,74 @@ def get_valid_coupon(coupon_code):
 	return None
 
 
-
-
 @app.route("/")
 def hello():
     return "Hello World!"
 
-# POST: Create campaign 
-@app.route("/campaign", methods=['POST'])
-def post_campaign():
-    input_json = request.get_json()
-    campaign = create_campaign_from_json(input_json)
-    db.session.add(campaign)
-    db.session.commit()
-    return jsonify(campaigns=campaign.serialize())
+@campaign_ns.route("/", methods=['GET', 'POST'])
+class CampaignCollection(Resource):
+    def get(self):
+        list_of_campaigns = Campaign.query.all()
+        return jsonify(campaigns=[e.serialize() for e in list_of_campaigns])
 
+    @api.expect(campaign)
+    def post(self):
+        input_json = request.json
+        campaign = create_campaign_from_json(input_json)
+        db.session.add(campaign)
+        db.session.commit()
+        return jsonify(campaigns=campaign.serialize())
 
-# GET: Get campaign info
-@app.route("/campaign", methods=['GET'])
-def get_all_campaigns():
-    list_of_campaigns = Campaign.query.all()
-    return jsonify(campaigns=[e.serialize() for e in list_of_campaigns])
 
 
 # GET: Get campaign info for specific campaign
-@app.route('/campaign/<int:campaign_id>')
-def get_campaign_from_id(campaign_id):
-    campaign = Campaign.query.filter_by(id=campaign_id).first()
-    return jsonify(campaign = campaign.serialize())
+@campaign_ns.route('/<int:campaign_id>')
+class CampaignItem(Resource):
+    def get(self, campaign_id):
+        campaign = Campaign.query.filter_by(id=campaign_id).first()
+        return jsonify(campaign = campaign.serialize())
 
 
 # GET: Ends campaign and returns campaign info with new expiration date for codes
-@app.route('/campaign/<int:campaign_id>/end_campaign')
-def end_campaign(campaign_id):
-    campaign = Campaign.query.filter_by(id=campaign_id).first()
-    campaign.update_expiration_date(datetime.now())
-    return jsonify(campaign = campaign.serialize())
+@campaign_ns.route('/<int:campaign_id>/end_campaign')
+class EndCampaign(Resource):
+    def get(self, campaign_id):
+        campaign = Campaign.query.filter_by(id=campaign_id).first()
+        campaign.update_expiration_date(datetime.now())
+        return jsonify(campaign = campaign.serialize())
 
 
 # GET: Get list of codes for specific campaign
-@app.route('/campaign/<campaign_id>/codes')
-def get_codes_from_campaign_id(campaign_id):
-    campaign = Campaign.query.filter_by(id=campaign_id).first()
-    return jsonify(coupons=[c.serialize() for c in campaign.coupons])
+@campaign_ns.route('/<int:campaign_id>/codes')
+class CodeCollection(Resource):
+    def get(self, campaign_id):
+        campaign = Campaign.query.filter_by(id=campaign_id).first()
+        return jsonify(coupons=[c.serialize() for c in campaign.coupons])
 
 
 # GET: Validate specific coupon code, returns Boolean
-@app.route('/validate/<coupon_code>')
-def validate_code(coupon_code):
-	coupon = get_valid_coupon(coupon_code)
-	if coupon == None:
-		return jsonify(valid=False)
-	return jsonify(valid=coupon.is_valid())
+@validate_ns.route('/validate/<string:coupon_code>')
+class ValidateCode(Resource):
+    def get(self, coupon_code):
+    	coupon = get_valid_coupon(coupon_code)
+    	if coupon == None:
+    		return jsonify(valid=False)
+    	return jsonify(valid=coupon.is_valid())
 
 
 # GET: Redeem coupon code, returns Boolean 
-@app.route('/redeem/<coupon_code>')
-def redeem_code(coupon_code):
-    coupon = get_valid_coupon(coupon_code)
-    if coupon == None:
-        return jsonify(seccess=False, error="No such code")
+@redeem_ns.route('/redeem/<string:coupon_code>')
+class RedeemCode(Resource):
+    def get(self, coupon_code):
+        coupon = get_valid_coupon(coupon_code)
+        if coupon == None:
+            return jsonify(seccess=False, error="No such code")
 
-    try:
-        coupon.redeem()
-        return jsonify(success=True, error=None)
-    except Exception as e:
-        return jsonify(success=False, error=e.message)
+        try:
+            coupon.redeem()
+            return jsonify(success=True, error=None)
+        except Exception as e:
+            return jsonify(success=False, error=e.message)
 
 
 
