@@ -105,7 +105,7 @@ class RedeemCode(Resource):
     def get(self, coupon_code):
         coupon = get_valid_coupon(coupon_code)
         if coupon == None:
-            return jsonify(seccess=False, error="No such code")
+            return jsonify(success=False, error="No such code")
 
         try:
             coupon.redeem()
