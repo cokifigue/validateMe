@@ -90,7 +90,7 @@ class CodeCollection(Resource):
 
 
 # GET: Validate specific coupon code, returns Boolean
-@validate_ns.route('/validate/<string:coupon_code>')
+@validate_ns.route('/<string:coupon_code>')
 class ValidateCode(Resource):
     def get(self, coupon_code):
     	coupon = get_valid_coupon(coupon_code)
@@ -100,7 +100,7 @@ class ValidateCode(Resource):
 
 
 # GET: Redeem coupon code, returns Boolean 
-@redeem_ns.route('/redeem/<string:coupon_code>')
+@redeem_ns.route('/<string:coupon_code>')
 class RedeemCode(Resource):
     def get(self, coupon_code):
         coupon = get_valid_coupon(coupon_code)
