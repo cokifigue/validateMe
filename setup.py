@@ -8,6 +8,7 @@ setup(
         'flask',
         'flask-restplus',
         'flask-sqlalchemy',
+        'flask-migrate',
         'hashids',
     ],
 )
