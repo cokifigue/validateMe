@@ -9,6 +9,7 @@ import random
 
 from models.campaign import Campaign
 from models.coupon import Coupon
+from models.redemption import Redemption
 from validateMe import app
 from validateMe import db
 from validateMe import api
@@ -86,6 +87,13 @@ class CodeCollection(Resource):
     def get(self, campaign_id):
         campaign = Campaign.query.filter_by(id=campaign_id).first()
         return jsonify(coupons=[c.serialize() for c in campaign.coupons])
+
+# GET: Get list of redemptions for specific campaign
+@campaign_ns.route('/<int:campaign_id>/redemptions')
+class CodeCollection(Resource):
+    def get(self, campaign_id):
+        redemptions = Redemption.query.filter(Redemption.coupon.has(campaign_id=campaign_id)).all()
+        return jsonify(redemptions=[r.serialize() for r in redemptions])
 
 
 # GET: Validate specific coupon code, returns Boolean
