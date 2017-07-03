@@ -9,6 +9,7 @@ import random
 
 from models.campaign import Campaign
 from models.coupon import Coupon
+from models.redemption import Redemption
 from validateMe import app
 from validateMe import db
 from validateMe import api
@@ -19,8 +20,7 @@ redeem_ns = api.namespace('redeem', description='Operations related to coupon re
 
 @app.before_first_request
 def setup():
-    # Recreate database each time for demo
-    db.drop_all()
+    # Create database/tables
     db.create_all()
 
     
@@ -88,6 +88,13 @@ class CodeCollection(Resource):
         campaign = Campaign.query.filter_by(id=campaign_id).first()
         return jsonify(coupons=[c.serialize() for c in campaign.coupons])
 
+# GET: Get list of redemptions for specific campaign
+@campaign_ns.route('/<int:campaign_id>/redemptions')
+class CodeCollection(Resource):
+    def get(self, campaign_id):
+        redemptions = Redemption.query.filter(Redemption.coupon.has(campaign_id=campaign_id)).all()
+        return jsonify(redemptions=[r.serialize() for r in redemptions])
+
 
 # GET: Validate specific coupon code, returns Boolean
 @validate_ns.route('/<string:coupon_code>')
@@ -105,7 +112,7 @@ class RedeemCode(Resource):
     def get(self, coupon_code):
         coupon = get_valid_coupon(coupon_code)
         if coupon == None:
-            return jsonify(seccess=False, error="No such code")
+            return jsonify(success=False, error="No such code")
 
         try:
             coupon.redeem()
