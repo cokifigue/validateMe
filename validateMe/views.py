@@ -19,8 +19,7 @@ redeem_ns = api.namespace('redeem', description='Operations related to coupon re
 
 @app.before_first_request
 def setup():
-    # Recreate database each time for demo
-    db.drop_all()
+    # Create database/tables
     db.create_all()
 
     
