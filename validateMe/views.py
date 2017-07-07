@@ -26,8 +26,12 @@ def setup():
     
 def create_campaign_from_json(json):
     campaign = Campaign(json['name'], json['max_uses_per_code'], json['expiration_date'], json['desc'], json['number_of_codes'])
-    print json
+    
     if 'coupons' in json and len(json['coupons']) > 0:
+        print len(json['coupons'])
+        print json['number_of_codes']
+        if len(json['coupons']) != json['number_of_codes']:
+            return None
         code_list = json['coupons']
         campaign.add_new_coupons(code_list)
     else:
@@ -55,9 +59,12 @@ class CampaignCollection(Resource):
         return jsonify(campaigns=[e.serialize() for e in list_of_campaigns])
 
     @api.expect(campaign)
+    @api.doc(responses={200: 'Success', 400: 'Bad Request'})
     def post(self):
         input_json = request.json
         campaign = create_campaign_from_json(input_json)
+        if campaign == None:
+            api.abort(400, "Length of 'coupons' list does not match 'number_of_codes' value")
         db.session.add(campaign)
         db.session.commit()
         return jsonify(campaigns=campaign.serialize())
