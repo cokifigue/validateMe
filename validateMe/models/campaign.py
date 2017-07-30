@@ -4,6 +4,8 @@ from random import randint
 from validateMe import db
 from datetime import datetime
 from time import strftime
+from sqlalchemy.sql import exists
+
 
 class Campaign(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -40,10 +42,11 @@ class Campaign(db.Model):
 			self.create_coupon(code, self.max_uses_per_code)
 
 	def create_coupon(self, code, max_uses):
-		coupon = Coupon(code, max_uses)
-		self.coupons.append(coupon)
-		db.session.add(coupon)
-		db.session.commit()
+		if not db.session.query(exists().where(Coupon.code == code)).scalar():
+			coupon = Coupon(code, max_uses)
+			self.coupons.append(coupon)
+			db.session.add(coupon)
+			db.session.commit()
 
 	def update_expiration_date(self, new_expiration_date):
 		self.expiration_date = new_expiration_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
